@@ -15,6 +15,9 @@ hase = Actor('bunny1_stand')
 carrots = []
 CARROT_CHANCE = 1
 
+monsters = []
+MONSTER_CHANCE = 1
+
 # Hier geben wir die Anfangsposition des Hasen an
 hase.x = 100
 hase.y = 500
@@ -22,21 +25,48 @@ hase.y = 500
 # ist der Hase oben angekommen?
 jump_down = False
 
+score = 0
+lifes = 3
+
 
 # Die draw Funktion zeichnet etwas in das Fenster
 # Mit screen.clear() stellen wir sicher, dass das fenster anfangs leer ist
 def draw():
-    global carrots
     screen.clear()
     screen.blit('background', (0, 0))
     hase.draw()
 
+    screen.blit('carrot_count', (20,640))
+    screen.blit('lifes', (150, 635))
+    screen.draw.text(f"{score}", (80, 640), color='black', fontsize=60)
+    screen.draw.text(f"{lifes}", (210, 640), color='black', fontsize=60)
+
     for carrot in carrots:
         carrot.draw()
+    for monster in monsters:
+        monster.draw()
 
 # Die update Funktion überprüft dauernd, ob etwas passiert
 def update():
+
+    # Die Funktionen, welche die Monster/Karotten hinzufügen werden aufgerufen
     make_carrots()
+    make_monsters()
+    global score
+    global lifes
+
+    for carrot in carrots:
+        if hase.colliderect(carrot):
+            score += 1
+            carrot.x = 750
+
+    for monster in monsters:
+        if hase.colliderect(monster):
+            lifes -= 1
+            monster.x = 750
+            if lifes == 0:
+                exit()
+
     # Wir nutzen if-statements um zu prüfen ob eine Taste gedrückt wird
     if hase.y < 500:
         hase.y = hase.y + 2
@@ -65,10 +95,26 @@ def update():
 
 
 def make_carrots():
-    global carrots
+    # Mit dieser Funktion erstellen wir zufällig die Karotten
 
     if random.randint(0,100) < CARROT_CHANCE:
-        y = random.randint(200, 400)
+        y = random.randint(70, 350)
         carrots.append(Actor('carrot_fly', (0, y)))
+
     for carrot in carrots:
         carrot.x = carrot.x + 3
+        if carrot.x >= 750:
+            carrots.remove(carrot)
+
+def make_monsters():
+    # Mit dieser Funktion erstellen wir zufällig die Monster
+
+    if random.randint(0, 300) < MONSTER_CHANCE:
+        y = random.randint(70, 350)
+        monsters.append(Actor('monster1', (0, y)))
+
+    for monster in monsters:
+        monster.x = monster.x + 3
+        if monster.x >= 750:
+            monsters.remove(monster)
+
