@@ -13,10 +13,9 @@ hase = Actor('bunny1_stand')
 
 # Eine Liste für die Karotten
 carrots = []
-CARROT_CHANCE = 1
 
+# Eine Liste für die Monster
 monsters = []
-MONSTER_CHANCE = 1
 
 # Hier geben wir die Anfangsposition des Hasen an
 hase.x = 100
@@ -25,22 +24,28 @@ hase.y = 500
 # ist der Hase oben angekommen?
 jump_down = False
 
+# Gesammelte Karotten und Anzahl Leben
 score = 0
 lifes = 3
-
 
 # Die draw Funktion zeichnet etwas in das Fenster
 # Mit screen.clear() stellen wir sicher, dass das fenster anfangs leer ist
 def draw():
     screen.clear()
+
+    # Fügt den Hintergrund hinzu
     screen.blit('background', (0, 0))
+
+    # Fügt den Hasen hinzu
     hase.draw()
 
+    # Zeichnet die Anzeige für die Karotten und Lebenspunkte
     screen.blit('carrot_count', (20,640))
     screen.blit('lifes', (150, 635))
     screen.draw.text(f"{score}", (80, 640), color='black', fontsize=60)
     screen.draw.text(f"{lifes}", (210, 640), color='black', fontsize=60)
 
+    # Zeichnet Karroten und Monster
     for carrot in carrots:
         carrot.draw()
     for monster in monsters:
@@ -48,6 +53,11 @@ def draw():
 
 # Die update Funktion überprüft dauernd, ob etwas passiert
 def update():
+
+    if hase.y < 500:
+        hase.image = "bunny1_jump"
+    else:
+        hase.image = "bunny1_stand"
 
     # Die Funktionen, welche die Monster/Karotten hinzufügen werden aufgerufen
     make_carrots()
@@ -68,14 +78,18 @@ def update():
                 exit()
 
     # Wir nutzen if-statements um zu prüfen ob eine Taste gedrückt wird
-    if hase.y < 500:
-        hase.y = hase.y + 2
+
     if keyboard[keys.RIGHT]:
         # Bewegt den Hasen nach rechts
         hase.x = hase.x + 3
     if keyboard[keys.LEFT]:
-        # bewegt den Hasen nach links
+        # Bewegt den Hasen nach links
         hase.x = hase.x - 3
+
+    if hase.y < 500:
+        #  Lässt den Hasen zürück auf den Boden fallen, nachdem er gesprungen ist
+        hase.y = hase.y + 2
+
     if keyboard[keys.SPACE]:
 
         global jump_down
@@ -88,16 +102,19 @@ def update():
 
         elif hase.y >= 200 and not jump_down:
             hase.y = hase.y - 5
-            jump_down = False
 
         elif hase.y < 200:
             jump_down = True
 
+def on_key_up(key):
+    if key == keys.SPACE:
+        global jump_down
+        jump_down = True
 
 def make_carrots():
     # Mit dieser Funktion erstellen wir zufällig die Karotten
 
-    if random.randint(0,100) < CARROT_CHANCE:
+    if random.randint(0,100) < 1:
         y = random.randint(70, 350)
         carrots.append(Actor('carrot_fly', (0, y)))
 
@@ -109,7 +126,7 @@ def make_carrots():
 def make_monsters():
     # Mit dieser Funktion erstellen wir zufällig die Monster
 
-    if random.randint(0, 300) < MONSTER_CHANCE:
+    if random.randint(0, 300) < 1:
         y = random.randint(70, 350)
         monsters.append(Actor('monster1', (0, y)))
 
